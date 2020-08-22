@@ -272,9 +272,8 @@ class DRAMCtrl : public QoS::MemCtrl
         void preDumpStats() override;
 
         Rank &rank;
-
         /*
-         * Lab 1-2
+         *  Lab 1-2
          */
         Stats::Scalar numFastAct;
         Stats::Scalar numSlowAct;
@@ -925,7 +924,7 @@ class DRAMCtrl : public QoS::MemCtrl
      */
     void activateBank(Rank& rank_ref, Bank& bank_ref, Tick act_tick,
                       uint32_t row);
-
+    Tick getActLatency(Rank& rank_ref, Bank& bank_ref, uint32_t row);
     /**
      * Precharge a given bank and also update when the precharge is
      * done. This will also deal with any stats related to the
@@ -1019,7 +1018,7 @@ class DRAMCtrl : public QoS::MemCtrl
     const uint32_t minWritesPerSwitch;
     uint32_t writesThisTime;
     uint32_t readsThisTime;
-
+    const bool dualActEnable;
     /**
      * Basic memory timing parameters initialized based on parameter
      * values.
@@ -1051,7 +1050,6 @@ class DRAMCtrl : public QoS::MemCtrl
     const Tick clkResyncDelay;
     unsigned int maxCommandsPerBurst;
     const bool dataClockSync;
-    const bool dualActEnable;
     const uint8_t twoCycleActivate;
     const uint32_t activationLimit;
     const Tick rankToRankDly;

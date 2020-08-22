@@ -146,11 +146,9 @@ class DRAMCtrl(QoSMemCtrl):
     # the amount of time in nanoseconds from issuing an activate command
     # to the data being available in the row buffer for a read/write
     tRCD = Param.Latency("RAS to CAS delay")
-    # Lab 1-2
-    # Add Dual Mode
-    dual_act_enable = Param.Bool(False, "Dual activation enable?")
-    tRCD_fast = Param.Latency("1ns", "Fast activation latency")
-    tRCD_slow = Param.Latency("1ns", "Slow activation latency")
+    dual_act_enable = Param.Bool(False,"Dual activation enable?")
+    tRCD_fast = Param.Latency("1ns","Fast activationo latency")
+    tRCD_slow = Param.Latency("1ns","Slow activation latency")
     # the time from issuing a read/write command to seeing the actual data
     tCL = Param.Latency("CAS latency")
 
@@ -738,16 +736,15 @@ class DDR4_2400_4x16(DDR4_2400_16x4):
     IDD5 = '280mA'
     IDD3P1 = '41mA'
 
-# Lab 1-2
+# Lab 1-2, Add Fast_Slow tRCD
 # A single DDR4-2400 x64 channel (one command and address bus), with
 # timings based on a DDR4-2400 8 Gbit datasheet (Micron MT40A512M16)
 # in an 4x16 configuration.
 # Total channel capacity is 4GB
 # 4 devices/rank * 1 ranks/channel * 1GB/device = 4GB/channel
-class DDR4_Lab(DDR4_2400_16x4):
+class DDR4_lab(DDR4_2400_16x4):
     # enable dual mode
     dual_act_enable = True
-
     # 4x16 configuration, 4 devices each with an 16-bit interface
     device_bus_width = 16
 
@@ -768,9 +765,7 @@ class DDR4_Lab(DDR4_2400_16x4):
     # configurations). Currently we do not capture the additional
     # constraints incurred by the bank groups
     banks_per_rank = 8
-    # dual mode
-    tRCD_fast = "15ns"
-    tRCD_slow = "30ns"
+
     # RRD_S (different bank group) for 2K page is MAX(4 CK, 5.3ns)
     tRRD = '5.3ns'
 
@@ -778,7 +773,9 @@ class DDR4_Lab(DDR4_2400_16x4):
     tRRD_L = '6.4ns';
 
     tXAW = '30ns'
-
+    # Tow mode for tRCD
+    tRCD_fast = '15ns'
+    tRCD_slow = '30ns'
     # Current values from datasheet
     IDD0 = '80mA'
     IDD02 = '4mA'
