@@ -146,7 +146,11 @@ class DRAMCtrl(QoSMemCtrl):
     # the amount of time in nanoseconds from issuing an activate command
     # to the data being available in the row buffer for a read/write
     tRCD = Param.Latency("RAS to CAS delay")
-
+    # Lab 1-2
+    # Add Dual Mode
+    dual_act_enable = Param.Bool(False, "Dual activation enable?")
+    tRCD_fast = Param.Latency("1ns", "Fast activation latency")
+    tRCD_slow = Param.Latency("1ns", "Slow activation latency")
     # the time from issuing a read/write command to seeing the actual data
     tCL = Param.Latency("CAS latency")
 
@@ -716,6 +720,57 @@ class DDR4_2400_4x16(DDR4_2400_16x4):
     # constraints incurred by the bank groups
     banks_per_rank = 8
 
+    # RRD_S (different bank group) for 2K page is MAX(4 CK, 5.3ns)
+    tRRD = '5.3ns'
+
+    # RRD_L (same bank group) for 2K page is MAX(4 CK, 6.4ns)
+    tRRD_L = '6.4ns';
+
+    tXAW = '30ns'
+
+    # Current values from datasheet
+    IDD0 = '80mA'
+    IDD02 = '4mA'
+    IDD2N = '34mA'
+    IDD3N = '47mA'
+    IDD4W = '228mA'
+    IDD4R = '243mA'
+    IDD5 = '280mA'
+    IDD3P1 = '41mA'
+
+# Lab 1-2
+# A single DDR4-2400 x64 channel (one command and address bus), with
+# timings based on a DDR4-2400 8 Gbit datasheet (Micron MT40A512M16)
+# in an 4x16 configuration.
+# Total channel capacity is 4GB
+# 4 devices/rank * 1 ranks/channel * 1GB/device = 4GB/channel
+class DDR4_Lab(DDR4_2400_16x4):
+    # enable dual mode
+    dual_act_enable = True
+
+    # 4x16 configuration, 4 devices each with an 16-bit interface
+    device_bus_width = 16
+
+    # Each device has a page (row buffer) size of 2 Kbyte (1K columns x16)
+    device_rowbuffer_size = '2kB'
+
+    # 4x16 configuration, so 4 devices
+    devices_per_rank = 4
+
+    # Single rank for x16
+    ranks_per_channel = 1
+
+    # DDR4 has 2 (x16) or 4 (x4 and x8) bank groups
+    # Set to 2 for x16 case
+    bank_groups_per_rank = 2
+
+    # DDR4 has 16 banks(x4,x8) and 8 banks(x16) (4 bank groups in all
+    # configurations). Currently we do not capture the additional
+    # constraints incurred by the bank groups
+    banks_per_rank = 8
+    # dual mode
+    tRCD_fast = "15ns"
+    tRCD_slow = "30ns"
     # RRD_S (different bank group) for 2K page is MAX(4 CK, 5.3ns)
     tRRD = '5.3ns'
 

@@ -76,10 +76,12 @@ DRAMCtrl::DRAMCtrl(const DRAMCtrlParams* p) :
     writeLowThreshold(writeBufferSize * p->write_low_thresh_perc / 100.0),
     minWritesPerSwitch(p->min_writes_per_switch),
     writesThisTime(0), readsThisTime(0),
+    dualActEnable(p->dual_act_enable),
     tCK(p->tCK), tRTW(p->tRTW), tCS(p->tCS), tBURST(p->tBURST),
     tBURST_MIN(p->tBURST_MIN),
     tCCD_L_WR(p->tCCD_L_WR),
-    tCCD_L(p->tCCD_L), tRCD(p->tRCD), tCL(p->tCL), tRP(p->tRP), tRAS(p->tRAS),
+    tCCD_L(p->tCCD_L), tRCD(p->tRCD), tRCD_fast(p->dual_act_enable),
+    tRCD_slow(p->tRCD_slow), tCL(p->tCL), tRP(p->tRP), tRAS(p->tRAS),
     tWR(p->tWR), tRTP(p->tRTP), tRFC(p->tRFC), tREFI(p->tREFI), tRRD(p->tRRD),
     tRRD_L(p->tRRD_L), tPPD(p->tPPD), tAAD(p->tAAD), tXAW(p->tXAW),
     tXP(p->tXP), tXS(p->tXS),
@@ -1045,6 +1047,7 @@ DRAMCtrl::activateBank(Rank& rank_ref, Bank& bank_ref,
     // verify that we have command bandwidth to issue the activate
     // if not, shift to next burst window
     Tick act_at;
+    Tick tRCD = getActLatency(rank_ref, bank_ref, row);
     if (twoCycleActivate)
         act_at = verifyMultiCmd(act_tick, tAAD);
     else
@@ -1144,7 +1147,14 @@ DRAMCtrl::activateBank(Rank& rank_ref, Bank& bank_ref,
         // move it sooner in time
         reschedule(rank_ref.activateEvent, act_at);
 }
-
+Tick
+DRAMCtrl::getActLatency(Rank& rank_ref, Bank& bank_ref, uint32_t row)
+{
+    if (row % 2 == 0)
+        return tRCD_fast;
+    else
+        return tRCD_slow;
+}
 void
 DRAMCtrl::prechargeBank(Rank& rank_ref, Bank& bank, Tick pre_tick,
                         bool auto_or_preall, bool trace)
@@ -2822,7 +2832,10 @@ DRAMCtrl::DRAMStats::resetStats()
 DRAMCtrl::RankStats::RankStats(DRAMCtrl &_memory, Rank &_rank)
     : Stats::Group(&_memory, csprintf("rank%d", _rank.rank).c_str()),
     rank(_rank),
-
+    // Lab 1-2
+    ADD_STAT(numFastAct,"The number of fast activation"),
+    ADD_STAT(numSlowAct,"The numbere of slow activation"),
+    // Lab 1-2
     ADD_STAT(actEnergy, "Energy for activate commands per rank (pJ)"),
     ADD_STAT(preEnergy, "Energy for precharge commands per rank (pJ)"),
     ADD_STAT(readEnergy, "Energy for read commands per rank (pJ)"),

@@ -274,6 +274,11 @@ class DRAMCtrl : public QoS::MemCtrl
         Rank &rank;
 
         /*
+         * Lab 1-2
+         */
+        Stats::Scalar numFastAct;
+        Stats::Scalar numSlowAct;
+        /*
          * Command energies
          */
         Stats::Scalar actEnergy;
@@ -1027,6 +1032,8 @@ class DRAMCtrl : public QoS::MemCtrl
     const Tick tCCD_L_WR;
     const Tick tCCD_L;
     const Tick tRCD;
+    const Tick tRCD_fast;
+    const Tick tRCD_slow;
     const Tick tCL;
     const Tick tRP;
     const Tick tRAS;
@@ -1044,6 +1051,7 @@ class DRAMCtrl : public QoS::MemCtrl
     const Tick clkResyncDelay;
     unsigned int maxCommandsPerBurst;
     const bool dataClockSync;
+    const bool dualActEnable;
     const uint8_t twoCycleActivate;
     const uint32_t activationLimit;
     const Tick rankToRankDly;
