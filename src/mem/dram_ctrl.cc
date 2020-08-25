@@ -1047,6 +1047,7 @@ DRAMCtrl::activateBank(Rank& rank_ref, Bank& bank_ref,
     // if not, shift to next burst window
     Tick act_at;
     Tick tRCD = getActLatency(rank_ref,bank_ref,row);
+    //act_count(row);
     if (twoCycleActivate)
         act_at = verifyMultiCmd(act_tick, tAAD);
     else
@@ -1150,10 +1151,13 @@ Tick
 DRAMCtrl::getActLatency(Rank& rank_ref, Bank& bank_ref, uint32_t row)
 {
     if (row%2 == 0) {
+        stats.numFastAct++;
         return tRCD_fast;
-
     } else
+    {
+        stats.numSlowAct++;
         return tRCD_slow;
+    }
 }
 void
 DRAMCtrl::prechargeBank(Rank& rank_ref, Bank& bank, Tick pre_tick,
@@ -2586,7 +2590,8 @@ DRAMCtrl::Rank::resetStats() {
 DRAMCtrl::DRAMStats::DRAMStats(DRAMCtrl &_dram)
     : Stats::Group(&_dram),
     dram(_dram),
-
+    ADD_STAT(numFastAct,"The number of fast activation"), // new
+    ADD_STAT(numSlowAct,"The number of slow activation"), // new
     ADD_STAT(readReqs, "Number of read requests accepted"),
     ADD_STAT(writeReqs, "Number of write requests accepted"),
 
@@ -2829,10 +2834,8 @@ DRAMCtrl::DRAMStats::resetStats()
 }
 
 DRAMCtrl::RankStats::RankStats(DRAMCtrl &_memory, Rank &_rank)
-    : Stats::Group(&_memory, csprintf("rank%d", _rank.rank).c_str()),
-    rank(_rank),
-    ADD_STAT(numFastAct,"The number of fast activation"), // new
-    ADD_STAT(numSlowAct,"The number of slow activation"), // new
+    : Stats::Group(&_memory, csprintf("rank%d", _rank.rank).c_str())
+    ,rank(_rank),
     ADD_STAT(actEnergy, "Energy for activate commands per rank (pJ)"),
     ADD_STAT(preEnergy, "Energy for precharge commands per rank (pJ)"),
     ADD_STAT(readEnergy, "Energy for read commands per rank (pJ)"),

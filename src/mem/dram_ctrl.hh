@@ -273,11 +273,6 @@ class DRAMCtrl : public QoS::MemCtrl
 
         Rank &rank;
         /*
-         *  Lab 1-2
-         */
-        Stats::Scalar numFastAct;
-        Stats::Scalar numSlowAct;
-        /*
          * Command energies
          */
         Stats::Scalar actEnergy;
@@ -368,7 +363,7 @@ class DRAMCtrl : public QoS::MemCtrl
          * Function to update Power Stats
          */
         void updatePowerStats();
-
+  //      void act_count();
         /**
          * Schedule a power state transition in the future, and
          * potentially override an already scheduled transition.
@@ -1111,7 +1106,11 @@ class DRAMCtrl : public QoS::MemCtrl
         void resetStats() override;
 
         DRAMCtrl &dram;
-
+        /*
+         *  Lab 1-2
+         */
+        Stats::Scalar numFastAct;
+        Stats::Scalar numSlowAct;
         Stats::Scalar readReqs;
         Stats::Scalar writeReqs;
         Stats::Scalar readBursts;
@@ -1227,7 +1226,10 @@ class DRAMCtrl : public QoS::MemCtrl
      * @param rank Current rank
      */
     void updatePowerStats(Rank& rank_ref);
-
+    /**
+     * @param rank Current rank
+     */
+  //  void act_count(uint32_t row);
     /**
      * Function for sorting Command structures based on timeStamp
      *

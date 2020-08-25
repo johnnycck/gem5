@@ -147,7 +147,7 @@ class DRAMCtrl(QoSMemCtrl):
     # to the data being available in the row buffer for a read/write
     tRCD = Param.Latency("RAS to CAS delay")
     dual_act_enable = Param.Bool(False,"Dual activation enable?")
-    tRCD_fast = Param.Latency("1ns","Fast activationo latency")
+    tRCD_fast = Param.Latency("1ns","Fast activation latency")
     tRCD_slow = Param.Latency("1ns","Slow activation latency")
     # the time from issuing a read/write command to seeing the actual data
     tCL = Param.Latency("CAS latency")
